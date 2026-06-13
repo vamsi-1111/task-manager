@@ -28,7 +28,7 @@ Internet access is required for Maven dependency resolution and for calling the 
 1. **Clone the repository**
 
    ```bash
-   git clone <repository-url>
+   git clone <github.com/vamsi-1111/task-manager>
    cd task-manager
    ```
 
