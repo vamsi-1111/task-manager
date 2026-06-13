@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Task Manager</title>
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			background: #f0f2f5;
+			color: #1a1a2e;
+			line-height: 1.5;
+			padding: 2rem 1rem;
+		}
+
+		.container {
+			max-width: 1100px;
+			margin: 0 auto;
+		}
+
+		header {
+			text-align: center;
+			margin-bottom: 2rem;
+		}
+
+		header h1 {
+			font-size: 2rem;
+			font-weight: 700;
+			color: #16213e;
+		}
+
+		header p {
+			color: #5a6270;
+			margin-top: 0.25rem;
+		}
+
+		section {
+			background: #fff;
+			border-radius: 10px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+		}
+
+		section h2 {
+			font-size: 1.25rem;
+			margin-bottom: 1rem;
+			color: #16213e;
+			border-bottom: 2px solid #e8ecf1;
+			padding-bottom: 0.5rem;
+		}
+
+		.section-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1rem;
+			border-bottom: 2px solid #e8ecf1;
+			padding-bottom: 0.5rem;
+		}
+
+		.section-header h2 {
+			margin-bottom: 0;
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+
+		button {
+			cursor: pointer;
+			border: none;
+			border-radius: 6px;
+			font-size: 0.875rem;
+			font-weight: 600;
+			padding: 0.5rem 1rem;
+			transition: background 0.15s, transform 0.1s;
+		}
+
+		button:active {
+			transform: scale(0.97);
+		}
+
+		.btn-primary {
+			background: #4361ee;
+			color: #fff;
+		}
+
+		.btn-primary:hover {
+			background: #3a56d4;
+		}
+
+		.btn-secondary {
+			background: #e8ecf1;
+			color: #1a1a2e;
+		}
+
+		.btn-secondary:hover {
+			background: #d5dbe3;
+		}
+
+		.btn-danger {
+			background: #ef476f;
+			color: #fff;
+			padding: 0.35rem 0.75rem;
+			font-size: 0.8rem;
+		}
+
+		.btn-danger:hover {
+			background: #d63d61;
+		}
+
+		.btn-update {
+			background: #4361ee;
+			color: #fff;
+			padding: 0.35rem 0.75rem;
+			font-size: 0.8rem;
+			margin-right: 0.35rem;
+		}
+
+		.btn-update:hover {
+			background: #3a56d4;
+		}
+
+		.action-buttons {
+			white-space: nowrap;
+		}
+
+		.edit-form-section {
+			margin-top: 1.5rem;
+			padding-top: 1.5rem;
+			border-top: 2px solid #e8ecf1;
+		}
+
+		.edit-form-section.hidden {
+			display: none;
+		}
+
+		.edit-form-section h3 {
+			font-size: 1.1rem;
+			margin-bottom: 1rem;
+			color: #16213e;
+		}
+
+		input[readonly] {
+			background: #f7f9fc;
+			color: #5a6270;
+			cursor: not-allowed;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.9rem;
+		}
+
+		th, td {
+			text-align: left;
+			padding: 0.75rem 0.5rem;
+			border-bottom: 1px solid #e8ecf1;
+		}
+
+		th {
+			background: #f7f9fc;
+			font-weight: 600;
+			color: #3d4663;
+			white-space: nowrap;
+		}
+
+		tr:hover td {
+			background: #fafbfd;
+		}
+
+		td.description {
+			max-width: 200px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.badge {
+			display: inline-block;
+			padding: 0.15rem 0.5rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+		}
+
+		.badge-low { background: #d4edda; color: #155724; }
+		.badge-medium { background: #fff3cd; color: #856404; }
+		.badge-high { background: #f8d7da; color: #721c24; }
+		.badge-todo { background: #e2e3e5; color: #383d41; }
+		.badge-in_progress { background: #cce5ff; color: #004085; }
+		.badge-done { background: #d4edda; color: #155724; }
+
+		.form-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+		}
+
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.35rem;
+		}
+
+		.form-group.full-width {
+			grid-column: 1 / -1;
+		}
+
+		label {
+			font-size: 0.85rem;
+			font-weight: 600;
+			color: #3d4663;
+		}
+
+		input, select {
+			padding: 0.55rem 0.75rem;
+			border: 1px solid #d5dbe3;
+			border-radius: 6px;
+			font-size: 0.9rem;
+			font-family: inherit;
+			transition: border-color 0.15s;
+		}
+
+		input:focus, select:focus {
+			outline: none;
+			border-color: #4361ee;
+			box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+		}
+
+		.form-actions {
+			grid-column: 1 / -1;
+			display: flex;
+			justify-content: flex-end;
+			margin-top: 0.25rem;
+		}
+
+		.summary-controls {
+			display: flex;
+			gap: 0.75rem;
+			align-items: flex-end;
+			margin-bottom: 1rem;
+		}
+
+		.summary-controls .form-group {
+			flex: 1;
+			max-width: 200px;
+		}
+
+		.summary-result {
+			background: #1a1a2e;
+			color: #a8dadc;
+			padding: 1rem;
+			border-radius: 8px;
+			overflow-x: auto;
+			font-size: 0.9rem;
+			line-height: 1.6;
+			min-height: 60px;
+			white-space: pre-wrap;
+		}
+
+		.summary-result.empty {
+			color: #5a6270;
+			background: #f7f9fc;
+			font-style: italic;
+		}
+
+		.message {
+			padding: 0.75rem 1rem;
+			border-radius: 6px;
+			margin-bottom: 1rem;
+			font-size: 0.875rem;
+			display: none;
+		}
+
+		.message.error {
+			display: block;
+			background: #f8d7da;
+			color: #721c24;
+			border: 1px solid #f5c6cb;
+		}
+
+		.message.success {
+			display: block;
+			background: #d4edda;
+			color: #155724;
+			border: 1px solid #c3e6cb;
+		}
+
+		.empty-state {
+			text-align: center;
+			padding: 2rem;
+			color: #5a6270;
+		}
+
+		@media (max-width: 768px) {
+			.form-grid {
+				grid-template-columns: 1fr;
+			}
+
+			table {
+				display: block;
+				overflow-x: auto;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Task Manager</h1>
+			<p>Manage your tasks with the Spring Boot REST API</p>
+		</header>
+
+		<div id="globalMessage" class="message"></div>
+
+		<section id="viewTasks">
+			<div class="section-header">
+				<h2>All Tasks</h2>
+				<button class="btn-secondary" onclick="loadTasks()">Refresh</button>
+			</div>
+			<div id="taskTableContainer">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Title</th>
+							<th>Description</th>
+							<th>Due Date</th>
+							<th>Priority</th>
+							<th>Status</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody id="taskTableBody">
+					</tbody>
+				</table>
+			</div>
+
+			<div id="editTaskSection" class="edit-form-section hidden">
+				<h3>Edit Task</h3>
+				<form id="editTaskForm">
+					<div class="form-grid">
+						<div class="form-group">
+							<label for="editId">ID</label>
+							<input type="text" id="editId" name="editId" readonly>
+						</div>
+						<div class="form-group">
+							<label for="editDueDate">Due Date</label>
+							<input type="date" id="editDueDate" name="editDueDate" required>
+						</div>
+						<div class="form-group full-width">
+							<label for="editTitle">Title</label>
+							<input type="text" id="editTitle" name="editTitle" required placeholder="Enter task title">
+						</div>
+						<div class="form-group full-width">
+							<label for="editDescription">Description</label>
+							<input type="text" id="editDescription" name="editDescription" placeholder="Enter task description (optional)">
+						</div>
+						<div class="form-group">
+							<label for="editPriority">Priority</label>
+							<select id="editPriority" name="editPriority" required>
+								<option value="LOW">LOW</option>
+								<option value="MEDIUM">MEDIUM</option>
+								<option value="HIGH">HIGH</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="editStatus">Status</label>
+							<select id="editStatus" name="editStatus" required>
+								<option value="TODO">TODO</option>
+								<option value="IN_PROGRESS">IN_PROGRESS</option>
+								<option value="DONE">DONE</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="button" class="btn-secondary" onclick="hideEditForm()">Cancel</button>
+							<button type="submit" class="btn-primary">Save Changes</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</section>
+
+		<section id="createTask">
+			<h2>Create New Task</h2>
+			<form id="createTaskForm">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="title">Title</label>
+						<input type="text" id="title" name="title" required placeholder="Enter task title">
+					</div>
+					<div class="form-group">
+						<label for="dueDate">Due Date</label>
+						<input type="date" id="dueDate" name="dueDate" required>
+					</div>
+					<div class="form-group full-width">
+						<label for="description">Description</label>
+						<input type="text" id="description" name="description" placeholder="Enter task description (optional)">
+					</div>
+					<div class="form-group">
+						<label for="priority">Priority</label>
+						<select id="priority" name="priority" required>
+							<option value="LOW">LOW</option>
+							<option value="MEDIUM" selected>MEDIUM</option>
+							<option value="HIGH">HIGH</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="status">Status</label>
+						<select id="status" name="status" required>
+							<option value="TODO" selected>TODO</option>
+							<option value="IN_PROGRESS">IN_PROGRESS</option>
+							<option value="DONE">DONE</option>
+						</select>
+					</div>
+					<div class="form-actions">
+						<button type="submit" class="btn-primary">Create Task</button>
+					</div>
+				</div>
+			</form>
+		</section>
+
+		<section id="aiSummary">
+			<h2>AI Summary</h2>
+			<div class="summary-controls">
+				<div class="form-group">
+					<label for="summaryTaskId">Task ID</label>
+					<input type="number" id="summaryTaskId" min="1" placeholder="Enter task ID">
+				</div>
+				<button class="btn-primary" onclick="generateSummary()">Generate Summary</button>
+			</div>
+			<div id="summaryResult" class="summary-result empty">Generated summary will appear here...</div>
+		</section>
+	</div>
+
+	<script>
+		const API_BASE = 'http://localhost:8080/tasks';
+		let cachedTasks = [];
+
+		function showMessage(text, type) {
+			const el = document.getElementById('globalMessage');
+			el.textContent = text;
+			el.className = 'message ' + type;
+			setTimeout(function () {
+				el.className = 'message';
+			}, 4000);
+		}
+
+		function priorityBadgeClass(priority) {
+			return 'badge badge-' + priority.toLowerCase();
+		}
+
+		function statusBadgeClass(status) {
+			return 'badge badge-' + status.toLowerCase();
+		}
+
+		function escapeHtml(text) {
+			if (text == null) return '';
+			const div = document.createElement('div');
+			div.textContent = text;
+			return div.innerHTML;
+		}
+
+		function hideEditForm() {
+			document.getElementById('editTaskSection').classList.add('hidden');
+			document.getElementById('editTaskForm').reset();
+		}
+
+		function openEditForm(id) {
+			const task = cachedTasks.find(function (t) { return t.id === id; });
+			if (!task) {
+				showMessage('Task not found.', 'error');
+				return;
+			}
+
+			document.getElementById('editId').value = task.id;
+			document.getElementById('editTitle').value = task.title || '';
+			document.getElementById('editDescription').value = task.description || '';
+			document.getElementById('editDueDate').value = task.dueDate || '';
+			document.getElementById('editPriority').value = task.priority;
+			document.getElementById('editStatus').value = task.status;
+
+			document.getElementById('editTaskSection').classList.remove('hidden');
+			document.getElementById('editTaskSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		}
+
+		async function loadTasks() {
+			const tbody = document.getElementById('taskTableBody');
+
+			try {
+				const response = await fetch(API_BASE);
+				if (!response.ok) {
+					throw new Error('Failed to load tasks: ' + response.status);
+				}
+
+				const tasks = await response.json();
+				cachedTasks = tasks;
+				tbody.innerHTML = '';
+
+				if (tasks.length === 0) {
+					tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No tasks found. Create one below!</td></tr>';
+					return;
+				}
+
+				tasks.forEach(function (task) {
+					const row = document.createElement('tr');
+					row.innerHTML =
+						'<td>' + escapeHtml(String(task.id)) + '</td>' +
+						'<td>' + escapeHtml(task.title) + '</td>' +
+						'<td class="description" title="' + escapeHtml(task.description || '') + '">' +
+							escapeHtml(task.description || '') + '</td>' +
+						'<td>' + escapeHtml(task.dueDate) + '</td>' +
+						'<td><span class="' + priorityBadgeClass(task.priority) + '">' +
+							escapeHtml(task.priority) + '</span></td>' +
+						'<td><span class="' + statusBadgeClass(task.status) + '">' +
+							escapeHtml(task.status) + '</span></td>' +
+						'<td class="action-buttons">' +
+							'<button class="btn-update" onclick="openEditForm(' + task.id + ')">Update</button>' +
+							'<button class="btn-danger" onclick="deleteTask(' + task.id + ')">Delete</button></td>';
+					tbody.appendChild(row);
+				});
+			} catch (err) {
+				tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error loading tasks.</td></tr>';
+				showMessage(err.message, 'error');
+			}
+		}
+
+		async function deleteTask(id) {
+			if (!confirm('Are you sure you want to delete task #' + id + '?')) {
+				return;
+			}
+
+			try {
+				const response = await fetch(API_BASE + '/' + id, { method: 'DELETE' });
+				if (!response.ok) {
+					throw new Error('Failed to delete task: ' + response.status);
+				}
+				showMessage('Task #' + id + ' deleted successfully.', 'success');
+				hideEditForm();
+				await loadTasks();
+			} catch (err) {
+				showMessage(err.message, 'error');
+			}
+		}
+
+		document.getElementById('editTaskForm').addEventListener('submit', async function (e) {
+			e.preventDefault();
+
+			const id = document.getElementById('editId').value;
+			const task = {
+				title: document.getElementById('editTitle').value.trim(),
+				description: document.getElementById('editDescription').value.trim() || null,
+				dueDate: document.getElementById('editDueDate').value,
+				priority: document.getElementById('editPriority').value,
+				status: document.getElementById('editStatus').value
+			};
+
+			try {
+				const response = await fetch(API_BASE + '/' + id, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(task)
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to update task: ' + response.status);
+				}
+
+				showMessage('Task #' + id + ' updated successfully.', 'success');
+				hideEditForm();
+				await loadTasks();
+			} catch (err) {
+				showMessage(err.message, 'error');
+			}
+		});
+
+		document.getElementById('createTaskForm').addEventListener('submit', async function (e) {
+			e.preventDefault();
+
+			const task = {
+				title: document.getElementById('title').value.trim(),
+				description: document.getElementById('description').value.trim() || null,
+				dueDate: document.getElementById('dueDate').value,
+				priority: document.getElementById('priority').value,
+				status: document.getElementById('status').value
+			};
+
+			try {
+				const response = await fetch(API_BASE, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(task)
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to create task: ' + response.status);
+				}
+
+				document.getElementById('createTaskForm').reset();
+				showMessage('Task created successfully.', 'success');
+				await loadTasks();
+			} catch (err) {
+				showMessage(err.message, 'error');
+			}
+		});
+
+		async function generateSummary() {
+			const idInput = document.getElementById('summaryTaskId');
+			const resultEl = document.getElementById('summaryResult');
+			const id = idInput.value.trim();
+
+			if (!id) {
+				showMessage('Please enter a task ID.', 'error');
+				return;
+			}
+
+			const numericId = Number(id);
+			if (!Number.isInteger(numericId) || numericId <= 0) {
+				resultEl.className = 'summary-result';
+				resultEl.textContent = 'Sorry, ID is not valid';
+				return;
+			}
+
+			resultEl.className = 'summary-result';
+			resultEl.textContent = 'Generating summary...';
+
+			try {
+				const response = await fetch(API_BASE + '/' + numericId + '/summarize', { method: 'POST' });
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.message || 'Failed to generate summary: ' + response.status);
+				}
+
+				resultEl.textContent = data.summary || 'No summary returned.';
+				showMessage('Summary generated for task #' + numericId + '.', 'success');
+			} catch (err) {
+				resultEl.className = 'summary-result empty';
+				resultEl.textContent = 'Generated summary will appear here...';
+				showMessage(err.message, 'error');
+			}
+		}
+
+		loadTasks();
+	</script>
+</body>
+</html>
